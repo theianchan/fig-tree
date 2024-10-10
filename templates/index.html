@@ -1,13 +1,29 @@
-{% extends "base.html" %}
-
-{% block content %}
-<h1>Welcome to the Fig Tree</h1>
-<div id="content">
-    <!-- Content will be dynamically updated here -->
-</div>
-<div id="choices">
-    <button onclick="makeChoice('education')">Pursue Education</button>
-    <button onclick="makeChoice('career')">Focus on Career</button>
-    <button onclick="makeChoice('travel')">Travel the World</button>
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fig Tree</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+  </head>
+  <body>
+    <div class="background-container">
+      <div class="background-text"></div>
+    </div>
+    <div class="card">
+      <h2>What's your name?</h2>
+      <input type="text" id="name" placeholder="Name" />
+      <button onclick="submitName()">SUBMIT</button>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>
