@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Welcome to the Fig Tree</h1>
+<div id="content">
+    <!-- Content will be dynamically updated here -->
+</div>
+<div id="choices">
+    <button onclick="makeChoice('education')">Pursue Education</button>
+    <button onclick="makeChoice('career')">Focus on Career</button>
+    <button onclick="makeChoice('travel')">Travel the World</button>
+</div>
+{% endblock %}
