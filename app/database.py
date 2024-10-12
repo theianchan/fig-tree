@@ -17,7 +17,7 @@ def init_db():
         age INTEGER, 
         story TEXT,
         last_tap TEXT,
-        time_last_tap TIMESTAMP,
+        time_last_stage TIMESTAMP,
         choice_21 TEXT,
         choice_28 TEXT,
         choice_35 TEXT,

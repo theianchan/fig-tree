@@ -79,6 +79,36 @@ function commit() {
     });
 }
 
+function noCommit() {
+  console.log("No commit");
+}
+
 function printReceipt() {
   console.log("Print receipt");
 }
+
+function updateTimer() {
+  const timerElement = document.getElementById("timer");
+  if (!timerElement) return;
+
+  const lastStageTime = new Date(timerElement.dataset.lastStage).getTime();
+  const currentTime = new Date().getTime();
+  const elapsedTime = currentTime - lastStageTime;
+  const remainingTime = Math.max(300000 - elapsedTime, 0); // 5 minutes in milliseconds
+
+  if (remainingTime === 0) {
+    timerElement.textContent = "00:00";
+    noCommit();
+    return;
+  }
+
+  const minutes = Math.floor(remainingTime / 60000);
+  const seconds = Math.floor((remainingTime % 60000) / 1000);
+  timerElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds
+    .toString()
+    .padStart(2, "0")}`;
+
+  setTimeout(updateTimer, 1000);
+}
+
+window.addEventListener("load", updateTimer);

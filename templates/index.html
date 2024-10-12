@@ -22,7 +22,10 @@
     {% if player %}
     <div class="position">
       <div class="card dark">
-        <span class="timer">{{ player['time_last_tap'] }}</span>
+        <span class="timer">
+          <span id="timer" data-last-stage="{{ player['time_last_stage'] }}">00:00</span>
+          remaining
+        </span>
       </div>
       <div class="card">
         <h2>
@@ -32,16 +35,15 @@
         <p>{{ player['last_tap'] }}</p>
 
         {% if player['age']|int < 77 %}
-          <button onclick="commit()">COMMIT</button>
-        {% endif %}
-        {% if player['age']|int >= 35 %}
-          <button onclick="printReceipt()">PRINT RECEIPT</button>
+        <button onclick="commit()">COMMIT</button>
+        {% endif %} {% if player['age']|int >= 35 %}
+        <button onclick="printReceipt()">PRINT RECEIPT</button>
         {% endif %}
       </div>
     </div>
     {% else %}
     <div class="position center">
-      <div class="card">      
+      <div class="card">
         <h2>What's your name?</h2>
         <input type="text" id="name" placeholder="Name" />
         <button onclick="submitName()">SUBMIT</button>

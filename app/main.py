@@ -17,17 +17,15 @@ app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 def index():
     user_id = request.cookies.get("userId")
     fig = request.args.get("fig")
-    
+
     if user_id:
         conn = get_db_connection()
         c = conn.cursor()
-        
+
         if fig:
-            current_time = datetime.now().isoformat()
-            c.execute("UPDATE players SET last_tap = ?, time_last_tap = ? WHERE id = ?", 
-                      (fig, current_time, user_id))
+            c.execute("UPDATE players SET last_tap = ? WHERE id = ?", (fig, user_id))
             conn.commit()
-        
+
         c.execute("SELECT * FROM players WHERE id = ?", (user_id,))
         player = c.fetchone()
         conn.close()
@@ -54,6 +52,7 @@ def submit_name():
         data = request.json
         name = data.get("name")
         user_id = generate_unique_id()
+        current_time = datetime.now().isoformat()
 
         logging.debug(f"Received name: {name}")
         logging.debug(f"Received user_id: {user_id}")
@@ -61,7 +60,8 @@ def submit_name():
         conn = get_db_connection()
         c = conn.cursor()
         c.execute(
-            "INSERT OR REPLACE INTO players (id, name, age) VALUES (?, ?, ?)", (user_id, name, 21)
+            "INSERT OR REPLACE INTO players (id, name, age, time_last_stage) VALUES (?, ?, ?, ?)",
+            (user_id, name, 21, current_time),
         )
         conn.commit()
         conn.close()
@@ -82,17 +82,22 @@ def submit_name():
 def commit():
     try:
         user_id = request.cookies.get("userId")
+        current_time = datetime.now().isoformat()
+
         if not user_id:
             return jsonify({"success": False, "message": "User not found"}), 400
 
         conn = get_db_connection()
         c = conn.cursor()
-        c.execute("UPDATE players SET age = age + 7 WHERE id = ?", (user_id,))
+        c.execute(
+            "UPDATE players SET age = age + 7, time_last_stage = ? WHERE id = ?",
+            (current_time, user_id),
+        )
         conn.commit()
         conn.close()
 
         return jsonify({"success": True, "message": "Age updated successfully"})
-    
+
     except Exception as e:
         logging.error(f"Error in commit: {str(e)}")
         return jsonify({"success": False, "message": "Server error"}), 500
