@@ -28,6 +28,16 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/data")
+def view_database():
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("SELECT * FROM players")
+    players = c.fetchall()
+    conn.close()
+    return render_template("data.html", players=players)
+
+
 @app.route("/submit_name", methods=["POST"])
 def submit_name():
     try:

@@ -16,14 +16,16 @@ def init_db():
         name TEXT NOT NULL,
         age INTEGER, 
         story TEXT,
-        choice_1 TEXT,
-        choice_2 TEXT,
-        choice_3 TEXT,
-        choice_4 TEXT,
-        choice_5 TEXT,
-        choice_6 TEXT,
-        choice_7 TEXT,
-        choice_8 TEXT)"""
+        last_tap TEXT,
+        time_last_tap TIMESTAMP,
+        choice_21 TEXT,
+        choice_28 TEXT,
+        choice_35 TEXT,
+        choice_42 TEXT,
+        choice_49 TEXT,
+        choice_56 TEXT,
+        choice_63 TEXT,
+        choice_70 TEXT)"""
     )
     conn.commit()
     conn.close()
