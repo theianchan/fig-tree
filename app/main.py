@@ -15,6 +15,8 @@ app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
 @app.route("/")
 def index():
+    logging.debug("Index route called")
+
     user_id = request.cookies.get("userId")
     fig = request.args.get("fig")
 
@@ -29,7 +31,7 @@ def index():
                 SET last_tap = %s
                 WHERE id = %s
                 """,
-                (fig, user_id)
+                (fig, user_id),
             )
             conn.commit()
 
@@ -39,7 +41,7 @@ def index():
             FROM players
             WHERE id = %s
             """,
-            (user_id,)
+            (user_id,),
         )
         player = c.fetchone()
         conn.close()
@@ -123,7 +125,7 @@ def handle_commit():
             FROM players
             WHERE id = %s
             """,
-            (user_id,)
+            (user_id,),
         )
         player = c.fetchone()
         current_age = player["age"]
@@ -165,7 +167,7 @@ def generate_unique_id():
             FROM players
             WHERE id = %s
             """,
-            (new_id,)
+            (new_id,),
         )
         if not c.fetchone():
             conn.close()
@@ -174,5 +176,6 @@ def generate_unique_id():
 
 
 if __name__ == "__main__":
+    logging.debug("Starting app")
     init_db()
     app.run(debug=True)

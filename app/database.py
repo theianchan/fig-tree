@@ -3,11 +3,12 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from app.config import DATABASE_URL, USE_SSL
 
+
 def get_db_connection():
     conn_params = {"dsn": DATABASE_URL}
     if USE_SSL:
         conn_params["sslmode"] = "require"
-    
+
     conn = psycopg2.connect(**conn_params)
     conn.cursor_factory = RealDictCursor
     return conn
