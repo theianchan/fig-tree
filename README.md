@@ -24,5 +24,9 @@ To interact with the database:
 When new libraries are installed:
 - `pip freeze > requirements.txt`
 
+Deploying:
+- `git push`
+- `git push heroku main`
+
 Remaining TODO:
 - Might want to pause the game when they're not playing
