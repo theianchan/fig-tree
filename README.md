@@ -16,10 +16,13 @@ To run locally:
 - `brew services start postgresql`
 - `python -m app.main`
 
-To interact with the database:
+To interact with the database locally:
 - `psql -d tree`
 - `\dt` to list tables
 - `\q` to quit
+
+To interact with the database on Heroku:
+- `heroku pg:psql`
 
 When new libraries are installed:
 - `pip freeze > requirements.txt`
