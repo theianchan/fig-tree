@@ -78,10 +78,11 @@ def submit_name():
         return jsonify({"success": False, "message": "Server error"}), 500
 
 
-@app.route("/commit", methods=["POST"])
-def commit():
+@app.route("/handle_commit", methods=["POST"])
+def handle_commit():
     try:
         user_id = request.cookies.get("userId")
+        committed = request.json.get("committed")
         current_time = datetime.now().isoformat()
 
         if not user_id:
@@ -89,17 +90,25 @@ def commit():
 
         conn = get_db_connection()
         c = conn.cursor()
+        
+        c.execute("SELECT age, last_tap FROM players WHERE id = ?", (user_id,))
+        player = c.fetchone()
+        current_age = player['age']
+        
+        choice_value = player['last_tap'] if committed else "no commit"
+
         c.execute(
-            "UPDATE players SET age = age + 7, time_last_stage = ? WHERE id = ?",
-            (current_time, user_id),
+            "UPDATE players SET age = age + 7, time_last_stage = ?, choice_" + str(current_age) + " = ?, last_tap = NULL WHERE id = ?",
+            (current_time, choice_value, user_id),
         )
         conn.commit()
         conn.close()
 
-        return jsonify({"success": True, "message": "Age updated successfully"})
+        action = "Commit" if committed else "No commit"
+        return jsonify({"success": True, "message": f"{action} recorded successfully"})
 
     except Exception as e:
-        logging.error(f"Error in commit: {str(e)}")
+        logging.error(f"Error in handle_commit: {str(e)}")
         return jsonify({"success": False, "message": "Server error"}), 500
 
 

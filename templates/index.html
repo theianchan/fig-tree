@@ -21,21 +21,37 @@
     </div>
     {% if player %}
     <div class="position">
+      {% if player['age']|int < 77 %}
       <div class="card dark">
         <span class="timer">
-          <span id="timer" data-last-stage="{{ player['time_last_stage'] }}">00:00</span>
+          <span
+            id="timer"
+            data-age="{{ player['age'] }}"
+            data-last-stage="{{ player['time_last_stage'] }}"
+            >00:00</span
+          >
           remaining
         </span>
       </div>
+      {% endif %}
       <div class="card">
         <h2>
           Hello, {{ player['name'] }}.<br />
           You are {{ player['age'] }} years old.
         </h2>
-        <p>{{ player['last_tap'] }}</p>
+        <ul>
+          {% for age in range(21, player['age']|int + 1, 7) %} {% if
+          player['choice_' ~ age] %}
+          <li>Age {{ age }}: {{ player['choice_' ~ age] }}</li>
+          {% endif %} {% endfor %}
+        </ul>
+        <p>Current tap: {{ player['last_tap'] }}</p>
 
-        {% if player['age']|int < 77 %}
+        {% if player['age']|int < 77 and player['last_tap'] %}
         <button onclick="commit()">COMMIT</button>
+        <p class="continue">Or tap another fig...</p>
+        {% elif player['age']|int < 77 %}
+        <p class="continue">Tap another fig to continue...</p>
         {% endif %} {% if player['age']|int >= 35 %}
         <button onclick="printReceipt()">PRINT RECEIPT</button>
         {% endif %}

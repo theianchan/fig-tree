@@ -85,6 +85,7 @@ html
 
     text-align: left;
 
+    color: #6c1a11;
     border: 2px solid #a86c53;
     border-radius: 8px;
     background-color: #fed284;
@@ -92,7 +93,6 @@ html
 
 .card.dark
 {
-    color: #6c1a11;
     border: 2px solid #6c1a11;
     background-color: #d78138;
 }
@@ -148,4 +148,9 @@ button
     background-color: #8b4513;
 
     font-optical-sizing: auto;
+}
+
+.continue
+{
+    font-weight: 700;
 }

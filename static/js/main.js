@@ -57,12 +57,13 @@ function submitName() {
     });
 }
 
-function commit() {
-  fetch("/commit", {
+function handleCommit(committed) {
+  fetch("/handle_commit", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    body: JSON.stringify({ committed: committed }),
   })
     .then((response) => {
       if (!response.ok) {
@@ -79,8 +80,12 @@ function commit() {
     });
 }
 
+function commit() {
+  handleCommit(true);
+}
+
 function noCommit() {
-  console.log("No commit");
+  handleCommit(false);
 }
 
 function printReceipt() {
@@ -91,10 +96,13 @@ function updateTimer() {
   const timerElement = document.getElementById("timer");
   if (!timerElement) return;
 
+  const playerAge = parseInt(timerElement.dataset.age);
+  if (playerAge >= 77) return;
+
   const lastStageTime = new Date(timerElement.dataset.lastStage).getTime();
   const currentTime = new Date().getTime();
   const elapsedTime = currentTime - lastStageTime;
-  const remainingTime = Math.max(300000 - elapsedTime, 0); // 5 minutes in milliseconds
+  const remainingTime = Math.max(0.5 * 60 * 1000 - elapsedTime, 0); // 5 minutes in milliseconds
 
   if (remainingTime === 0) {
     timerElement.textContent = "00:00";
