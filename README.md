@@ -23,6 +23,7 @@ To interact with the database:
 
 When new libraries are installed:
 - `pip freeze > requirements.txt`
+- Make sure `gunicorn==20.1.0` is included since the above command removes this line
 
 Deploying:
 - `git push`
