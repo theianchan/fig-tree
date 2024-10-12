@@ -149,5 +149,17 @@ function updateTimer() {
   timerTimeout = setTimeout(updateTimer, 1000);
 }
 
+function clearUrlParameters() {
+  if (window.history.replaceState) {
+    var newUrl =
+      window.location.protocol +
+      "//" +
+      window.location.host +
+      window.location.pathname;
+    window.history.replaceState({ path: newUrl }, "", newUrl);
+  }
+}
+
 window.addEventListener("load", updateTimer);
 window.addEventListener("load", initializeWindow);
+window.addEventListener("load", clearUrlParameters);

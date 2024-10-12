@@ -55,9 +55,7 @@ def index():
         conn.close()
 
         if player:
-            response = make_response(render_template("index.html", player=player))
-            response.headers["Location"] = url_for("index")
-            return response, 302
+            return render_template("index.html", player=player)
 
     return render_template("index.html")
 
