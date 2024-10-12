@@ -32,7 +32,7 @@ function getCookie(name) {
   if (parts.length === 2) return parts.pop().split(";").shift();
 }
 
-function submitName() {
+function submitName(fig) {
   const name = document.getElementById("name").value;
 
   fetch("/submit_name", {
@@ -40,7 +40,7 @@ function submitName() {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ name: name }),
+    body: JSON.stringify({ name: name, fig: fig }),
   })
     .then((response) => {
       if (!response.ok) {
@@ -62,7 +62,6 @@ function initializeWindow() {
   localStorage.setItem("activeWindowId", windowId);
 
   setInterval(() => {
-    console.log("Checking if window is still active");
     if (localStorage.getItem("activeWindowId") !== windowId) {
       deactivateWindow();
     }

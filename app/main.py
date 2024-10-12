@@ -57,7 +57,9 @@ def index():
         if player:
             return render_template("index.html", player=player)
 
-    return render_template("index.html")
+    return render_template("index.html", fig=fig)
+    # Write the value of `fig` to the template for new players
+    # This won't otherwise be preserved since we strip parameters
 
 
 @app.route("/data")
@@ -80,6 +82,7 @@ def submit_name():
     try:
         data = request.json
         name = data.get("name")
+        fig = data.get("fig")
         user_id = generate_unique_id()
         current_time = datetime.now(timezone.utc).isoformat()
 
@@ -87,14 +90,14 @@ def submit_name():
         c = conn.cursor()
         c.execute(
             """
-            INSERT INTO players (id, name, age, time_last_stage)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO players (id, name, age, time_last_stage, last_tap)
+            VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT (id) DO UPDATE
             SET name = EXCLUDED.name,
                 age = EXCLUDED.age,
                 time_last_stage = EXCLUDED.time_last_stage
             """,
-            (user_id, name, 21, current_time),
+            (user_id, name, 21, current_time, fig),
         )
         conn.commit()
         conn.close()
