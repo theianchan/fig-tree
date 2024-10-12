@@ -100,7 +100,7 @@ function updateTimer() {
   if (playerAge >= 77) return;
 
   const lastStageTime = new Date(timerElement.dataset.lastStage).getTime();
-  const currentTime = new Date().getTime();
+  const currentTime = new Date().getTime() + new Date().getTimezoneOffset() * 60000;
   const elapsedTime = currentTime - lastStageTime;
   const remainingTime = Math.max(0.5 * 60 * 1000 - elapsedTime, 0); // 5 minutes in milliseconds
 

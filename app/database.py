@@ -15,7 +15,6 @@ def get_db_connection():
 
 
 def init_db():
-    logging.debug("Initializing database")
     conn = get_db_connection()
     try:
         c = conn.cursor()
@@ -40,7 +39,6 @@ def init_db():
             """
         )
         conn.commit()
-        logging.debug("Database initialized")
     except Exception as e:
         logging.error(f"Error initializing database: {e}")
     finally:

@@ -4,7 +4,7 @@ import random
 import string
 from .config import template_dir, static_dir
 from .database import get_db_connection, init_db
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def create_app():
@@ -25,8 +25,6 @@ app = create_app()
 
 @app.route("/")
 def index():
-    logging.debug("Index route called")
-
     user_id = request.cookies.get("userId")
     fig = request.args.get("fig")
 
@@ -83,10 +81,7 @@ def submit_name():
         data = request.json
         name = data.get("name")
         user_id = generate_unique_id()
-        current_time = datetime.now().isoformat()
-
-        logging.debug(f"Received name: {name}")
-        logging.debug(f"Received user_id: {user_id}")
+        current_time = datetime.now(timezone.utc).isoformat()
 
         conn = get_db_connection()
         c = conn.cursor()
@@ -121,7 +116,7 @@ def handle_commit():
     try:
         user_id = request.cookies.get("userId")
         committed = request.json.get("committed")
-        current_time = datetime.now().isoformat()
+        current_time = datetime.now(timezone.utc).isoformat()
 
         if not user_id:
             return jsonify({"success": False, "message": "User not found"}), 400
@@ -186,6 +181,4 @@ def generate_unique_id():
 
 
 if __name__ == "__main__":
-    logging.debug("Name = main")
-    
     app.run(debug=True)
