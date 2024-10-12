@@ -13,59 +13,44 @@ function repeatText() {
 window.addEventListener("load", repeatText);
 window.addEventListener("resize", repeatText);
 
+function generateUniqueId() {
+  return "id_" + Math.random().toString(36).substr(2, 9);
+}
+
+function getOrCreateUserId() {
+  let userId = localStorage.getItem("userId");
+  if (!userId) {
+    userId = generateUniqueId();
+    localStorage.setItem("userId", userId);
+  }
+  return userId;
+}
+
 function submitName() {
   const name = document.getElementById("name").value;
-  if (name) {
-    // Here you can add logic to handle the name submission
-    console.log("Name submitted:", name);
-    // You might want to redirect to the next page or start the game here
-  }
-}
+  const userId = getOrCreateUserId();
 
-function getUserId() {
-  return localStorage.getItem("userId");
-}
+  console.log(name, userId);
 
-function setUserId(userId) {
-  localStorage.setItem("userId", userId);
-}
-
-function initSession() {
-  fetch("/init", { method: "POST" })
-    .then((response) => response.json())
+  fetch("/submit_name", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name: name, userId: userId }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
     .then((data) => {
-      setUserId(data.user_id);
-      updateContent("Welcome to the Fig Tree! Make your first choice:");
+      console.log("Success:", data);
+      // Handle success (e.g., move to next screen)
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      // Handle error (e.g., show error message to user)
     });
 }
-
-function makeChoice(choice) {
-  const userId = getUserId();
-  fetch(`/choice/${choice}`, {
-    method: "POST",
-    headers: { "X-User-ID": userId },
-  })
-    .then((response) => response.json())
-    .then((data) => updateContent(data.message, data.age, data.stage));
-}
-
-function updateContent(message, age, stage) {
-  const content = document.getElementById("content");
-  content.innerHTML = `
-        <p>${message}</p>
-        <p>Your age: ${age}</p>
-        <p>Current stage: ${stage}</p>
-    `;
-  // Add more dynamic content updates here
-}
-
-// Initialize session when page loads
-if (!getUserId()) {
-  initSession();
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  if (!getUserId()) {
-    initSession();
-  }
-});
