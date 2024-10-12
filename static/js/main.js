@@ -56,3 +56,29 @@ function submitName() {
       console.error("Error:", error);
     });
 }
+
+function commit() {
+  fetch("/commit", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Success:", data);
+      window.location.href = "/";
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
+function printReceipt() {
+  console.log("Print receipt");
+}

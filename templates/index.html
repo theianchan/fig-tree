@@ -19,9 +19,18 @@
     <div class="background-container">
       <div class="background-text"></div>
     </div>
-    {% if name %}
+    {% if player %}
     <div class="card">
-      <h2>Hello, {{ name }}</h2>
+      <h2>
+        Hello, {{ player['name'] }}.<br />
+        You are {{ player['age'] }} years old.
+      </h2>
+      {% if player['age']|int < 77 %}
+        <button onclick="commit()">COMMIT</button>
+      {% endif %}
+      {% if player['age']|int >= 35 %}
+        <button onclick="printReceipt()">PRINT RECEIPT</button>
+      {% endif %}
     </div>
     {% else %}
     <div class="card">      

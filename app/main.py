@@ -18,12 +18,12 @@ def index():
     if user_id:
         conn = get_db_connection()
         c = conn.cursor()
-        c.execute("SELECT name FROM players WHERE id = ?", (user_id,))
-        result = c.fetchone()
+        c.execute("SELECT * FROM players WHERE id = ?", (user_id,))
+        player = c.fetchone()
         conn.close()
 
-        if result:
-            return render_template("index.html", name=result["name"])
+        if player:
+            return render_template("index.html", player=player)
 
     return render_template("index.html")
 
@@ -51,7 +51,7 @@ def submit_name():
         conn = get_db_connection()
         c = conn.cursor()
         c.execute(
-            "INSERT OR REPLACE INTO players (id, name) VALUES (?, ?)", (user_id, name)
+            "INSERT OR REPLACE INTO players (id, name, age) VALUES (?, ?, ?)", (user_id, name, 21)
         )
         conn.commit()
         conn.close()
@@ -65,6 +65,26 @@ def submit_name():
 
     except Exception as e:
         logging.error(f"Error in submit_name: {str(e)}")
+        return jsonify({"success": False, "message": "Server error"}), 500
+
+
+@app.route("/commit", methods=["POST"])
+def commit():
+    try:
+        user_id = request.cookies.get("userId")
+        if not user_id:
+            return jsonify({"success": False, "message": "User not found"}), 400
+
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("UPDATE players SET age = age + 7 WHERE id = ?", (user_id,))
+        conn.commit()
+        conn.close()
+
+        return jsonify({"success": True, "message": "Age updated successfully"})
+    
+    except Exception as e:
+        logging.error(f"Error in commit: {str(e)}")
         return jsonify({"success": False, "message": "Server error"}), 500
 
 
