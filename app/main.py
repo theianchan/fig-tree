@@ -4,6 +4,7 @@ import random
 import string
 from .config import template_dir, static_dir
 from .database import get_db_connection, init_db
+from datetime import datetime
 
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -15,9 +16,18 @@ app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 @app.route("/")
 def index():
     user_id = request.cookies.get("userId")
+    fig = request.args.get("fig")
+    
     if user_id:
         conn = get_db_connection()
         c = conn.cursor()
+        
+        if fig:
+            current_time = datetime.now().isoformat()
+            c.execute("UPDATE players SET last_tap = ?, time_last_tap = ? WHERE id = ?", 
+                      (fig, current_time, user_id))
+            conn.commit()
+        
         c.execute("SELECT * FROM players WHERE id = ?", (user_id,))
         player = c.fetchone()
         conn.close()

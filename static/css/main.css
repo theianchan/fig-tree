@@ -59,19 +59,30 @@ html
     }
 }
 
-.card
+.position
 {
     position: fixed;
     z-index: 10;
-    top: 50%;
     left: 50%;
 
+    transform: translate(-50%);
+}
+
+.position.center
+{
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+.card
+{
     box-sizing: border-box;
     width: 100%;
     max-width: 360px;
+    margin: 25px 0;
     padding: 24px;
 
-    transform: translate(-50%, -50%);
     text-align: left;
 
     border: 2px solid #a86c53;
@@ -79,14 +90,25 @@ html
     background-color: #fed284;
 }
 
-h2
+.card.dark
+{
+    color: #6c1a11;
+    border: 2px solid #6c1a11;
+    background-color: #d78138;
+}
+
+h2,
+span.timer
 {
     font-size: 24px;
     font-weight: 700;
 
-    margin: 0 0 16px;
-
     color: #6c1a11;
+}
+
+h2
+{
+    margin: 0 0 16px;
 }
 
 input[type='text']

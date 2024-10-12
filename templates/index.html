@@ -20,23 +20,32 @@
       <div class="background-text"></div>
     </div>
     {% if player %}
-    <div class="card">
-      <h2>
-        Hello, {{ player['name'] }}.<br />
-        You are {{ player['age'] }} years old.
-      </h2>
-      {% if player['age']|int < 77 %}
-        <button onclick="commit()">COMMIT</button>
-      {% endif %}
-      {% if player['age']|int >= 35 %}
-        <button onclick="printReceipt()">PRINT RECEIPT</button>
-      {% endif %}
+    <div class="position">
+      <div class="card dark">
+        <span class="timer">{{ player['time_last_tap'] }}</span>
+      </div>
+      <div class="card">
+        <h2>
+          Hello, {{ player['name'] }}.<br />
+          You are {{ player['age'] }} years old.
+        </h2>
+        <p>{{ player['last_tap'] }}</p>
+
+        {% if player['age']|int < 77 %}
+          <button onclick="commit()">COMMIT</button>
+        {% endif %}
+        {% if player['age']|int >= 35 %}
+          <button onclick="printReceipt()">PRINT RECEIPT</button>
+        {% endif %}
+      </div>
     </div>
     {% else %}
-    <div class="card">      
-      <h2>What's your name?</h2>
-      <input type="text" id="name" placeholder="Name" />
-      <button onclick="submitName()">SUBMIT</button>
+    <div class="position center">
+      <div class="card">      
+        <h2>What's your name?</h2>
+        <input type="text" id="name" placeholder="Name" />
+        <button onclick="submitName()">SUBMIT</button>
+      </div>
     </div>
     {% endif %}
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
