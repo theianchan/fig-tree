@@ -57,6 +57,35 @@ function submitName() {
     });
 }
 
+function initializeWindow() {
+  const windowId = Date.now().toString();
+  localStorage.setItem("activeWindowId", windowId);
+
+  setInterval(() => {
+    console.log("Checking if window is still active");
+    if (localStorage.getItem("activeWindowId") !== windowId) {
+      deactivateWindow();
+    }
+  }, 1000);
+}
+
+function deactivateWindow() {
+  clearTimeout(timerTimeout);
+
+  const buttons = document.querySelectorAll("button");
+  buttons.forEach((button) => {
+    button.disabled = true;
+    button.style.opacity = "0.5";
+  });
+
+  const timerCard = document.querySelector(".card.dark");
+  if (timerCard) {
+    timerCard.style.display = "none";
+  }
+}
+
+let timerTimeout;
+
 function handleCommit(committed) {
   fetch("/handle_commit", {
     method: "POST",
@@ -100,7 +129,8 @@ function updateTimer() {
   if (playerAge >= 77) return;
 
   const lastStageTime = new Date(timerElement.dataset.lastStage).getTime();
-  const currentTime = new Date().getTime() + new Date().getTimezoneOffset() * 60000;
+  const currentTime =
+    new Date().getTime() + new Date().getTimezoneOffset() * 60000;
   const elapsedTime = currentTime - lastStageTime;
   const remainingTime = Math.max(0.5 * 60 * 1000 - elapsedTime, 0); // 5 minutes in milliseconds
 
@@ -116,7 +146,8 @@ function updateTimer() {
     .toString()
     .padStart(2, "0")}`;
 
-  setTimeout(updateTimer, 1000);
+  timerTimeout = setTimeout(updateTimer, 1000);
 }
 
 window.addEventListener("load", updateTimer);
+window.addEventListener("load", initializeWindow);
