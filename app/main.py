@@ -23,10 +23,24 @@ def index():
         c = conn.cursor()
 
         if fig:
-            c.execute("UPDATE players SET last_tap = ? WHERE id = ?", (fig, user_id))
+            c.execute(
+                """
+                UPDATE players
+                SET last_tap = %s
+                WHERE id = %s
+                """,
+                (fig, user_id)
+            )
             conn.commit()
 
-        c.execute("SELECT * FROM players WHERE id = ?", (user_id,))
+        c.execute(
+            """
+            SELECT *
+            FROM players
+            WHERE id = %s
+            """,
+            (user_id,)
+        )
         player = c.fetchone()
         conn.close()
 
@@ -40,7 +54,12 @@ def index():
 def view_database():
     conn = get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT * FROM players")
+    c.execute(
+        """
+        SELECT *
+        FROM players
+        """
+    )
     players = c.fetchall()
     conn.close()
     return render_template("data.html", players=players)
@@ -60,7 +79,14 @@ def submit_name():
         conn = get_db_connection()
         c = conn.cursor()
         c.execute(
-            "INSERT OR REPLACE INTO players (id, name, age, time_last_stage) VALUES (?, ?, ?, ?)",
+            """
+            INSERT INTO players (id, name, age, time_last_stage)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (id) DO UPDATE
+            SET name = EXCLUDED.name,
+                age = EXCLUDED.age,
+                time_last_stage = EXCLUDED.time_last_stage
+            """,
             (user_id, name, 21, current_time),
         )
         conn.commit()
@@ -90,15 +116,29 @@ def handle_commit():
 
         conn = get_db_connection()
         c = conn.cursor()
-        
-        c.execute("SELECT age, last_tap FROM players WHERE id = ?", (user_id,))
-        player = c.fetchone()
-        current_age = player['age']
-        
-        choice_value = player['last_tap'] if committed else "no commit"
 
         c.execute(
-            "UPDATE players SET age = age + 7, time_last_stage = ?, choice_" + str(current_age) + " = ?, last_tap = NULL WHERE id = ?",
+            """
+            SELECT age, last_tap
+            FROM players
+            WHERE id = %s
+            """,
+            (user_id,)
+        )
+        player = c.fetchone()
+        current_age = player["age"]
+
+        choice_value = player["last_tap"] if committed else "no commit"
+
+        c.execute(
+            f"""
+            UPDATE players
+            SET age = age + 7,
+                time_last_stage = %s,
+                choice_{current_age} = %s,
+                last_tap = NULL
+            WHERE id = %s
+            """,
             (current_time, choice_value, user_id),
         )
         conn.commit()
@@ -119,7 +159,14 @@ def generate_unique_id():
         )
         conn = get_db_connection()
         c = conn.cursor()
-        c.execute("SELECT id FROM players WHERE id = ?", (new_id,))
+        c.execute(
+            """
+            SELECT id
+            FROM players
+            WHERE id = %s
+            """,
+            (new_id,)
+        )
         if not c.fetchone():
             conn.close()
             return new_id
