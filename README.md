@@ -5,6 +5,6 @@ To install on new machine:
 
 To run locally: 
 - `source venv/bin/activate`
-- `python app.py`
+- `python -m app.main`
 
 `pip freeze > requirements.txt` when new libraries are installed.

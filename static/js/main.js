@@ -18,39 +18,41 @@ function generateUniqueId() {
 }
 
 function getOrCreateUserId() {
-  let userId = localStorage.getItem("userId");
+  let userId = getCookie("userId");
   if (!userId) {
     userId = generateUniqueId();
-    localStorage.setItem("userId", userId);
+    document.cookie = `userId=${userId}; path=/; max-age=${60 * 60 * 24 * 365}`; // 1 year expiry
   }
   return userId;
 }
 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+}
+
 function submitName() {
   const name = document.getElementById("name").value;
-  const userId = getOrCreateUserId();
-
-  console.log(name, userId);
 
   fetch("/submit_name", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ name: name, userId: userId }),
+    body: JSON.stringify({ name: name }),
   })
     .then((response) => {
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
       return response.json();
     })
     .then((data) => {
       console.log("Success:", data);
-      // Handle success (e.g., move to next screen)
+      window.location.reload();
     })
     .catch((error) => {
       console.error("Error:", error);
-      // Handle error (e.g., show error message to user)
     });
 }

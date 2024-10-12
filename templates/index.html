@@ -20,9 +20,13 @@
       <div class="background-text"></div>
     </div>
     <div class="card">
+      {% if name %}
+      <h2>Hello, {{ name }}</h2>
+      {% else %}
       <h2>What's your name?</h2>
       <input type="text" id="name" placeholder="Name" />
       <button onclick="submitName()">SUBMIT</button>
+      {% endif %}
     </div>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   </body>
