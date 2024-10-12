@@ -186,4 +186,6 @@ def generate_unique_id():
 
 
 if __name__ == "__main__":
+    logging.debug("Name = main")
+    
     app.run(debug=True)
