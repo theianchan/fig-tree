@@ -1,4 +1,4 @@
-import os
+import logging
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from app.config import DATABASE_URL, USE_SSL
@@ -14,6 +14,7 @@ def get_db_connection():
 
 
 def init_db():
+    logging.debug("Initializing database")
     conn = get_db_connection()
     try:
         c = conn.cursor()
@@ -38,7 +39,8 @@ def init_db():
             """
         )
         conn.commit()
+        logging.debug("Database initialized")
     except Exception as e:
-        print(f"Error initializing database: {e}")
+        logging.error(f"Error initializing database: {e}")
     finally:
         conn.close()
