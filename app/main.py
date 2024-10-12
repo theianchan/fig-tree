@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, make_response
+from flask import Flask, render_template, request, jsonify, make_response, url_for
 import logging
 import random
 import string
@@ -55,7 +55,9 @@ def index():
         conn.close()
 
         if player:
-            return render_template("index.html", player=player)
+            response = make_response(render_template("index.html", player=player))
+            response.headers["Location"] = url_for("index")
+            return response, 302
 
     return render_template("index.html")
 
