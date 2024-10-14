@@ -22,16 +22,19 @@
     {% if player %}
     <div class="position">
       {% if player['current_age']|int < 77 %}
-      <div class="card dark">
-        <span class="timer">
-          <span
-            id="timer"
-            data-current-age="{{ player['current_age'] }}"
-            data-time-stage-started="{{ player['time_stage_started'] }}"
-            >00:00</span
-          >
-          remaining
-        </span>
+      <div id="timer-container">
+        <div class="card top dark">
+          <span class="timer">
+            <span
+              id="timer"
+              data-current-age="{{ player['current_age'] }}"
+              data-time-stage-started="{{ player['time_stage_started'] }}"
+              >00:00</span
+            >
+            remaining
+          </span>
+        </div>
+        <div class="timer-spacer"></div>
       </div>
       {% endif %}
       <div class="card">
@@ -49,7 +52,7 @@
         <p>Time passes...</p>
         {% endfor %}
 
-        <h2>
+        <h2 id="currentState">
         Hello, {{ player['name'] }}.<br />
         You are {{ player['current_age'] }} years old.
         </h2>

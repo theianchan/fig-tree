@@ -70,6 +70,13 @@ function deactivateWindow() {
   }
 }
 
+function scrollToCurrentState() {
+  const currentState = document.getElementById("currentState");
+  if (currentState) {
+    currentState.scrollIntoView({ behavior: "smooth" });
+  }
+}
+
 function handleCommit(committed) {
   const commitButton = document.getElementById('commit');
   commitButton.disabled = true;
@@ -151,7 +158,9 @@ function clearUrlParameters() {
 }
 
 window.addEventListener("load", repeatText);
-window.addEventListener("resize", repeatText);
 window.addEventListener("load", updateTimer);
 window.addEventListener("load", initializeWindow);
 window.addEventListener("load", clearUrlParameters);
+window.addEventListener("load", scrollToCurrentState);
+
+window.addEventListener("resize", repeatText);
