@@ -54,12 +54,16 @@
         <p>Current option: {{ player['current_option'] }}</p>
 
         {% if player['current_age']|int < 77 and player['current_option'] %}
-        <button onclick="commit()">COMMIT</button>
+        <button id="commit" onclick="commit()">COMMIT</button>
         <p class="continue">Or tap another fig...</p>
         {% elif player['current_age']|int < 77 %}
         <p class="continue">Tap another fig to continue...</p>
-        {% endif %} {% if player['current_age']|int >= 35 %}
-        <button onclick="printReceipt()">PRINT RECEIPT</button>
+        {% endif %} 
+        
+        {% if player['current_age']|int >= 35 %}
+        <button id="printReceipt" onclick="printReceipt()">
+          PRINT RECEIPT
+        </button>
         {% endif %}
       </div>
     </div>
@@ -68,7 +72,9 @@
       <div class="card">
         <h2>What's your name?</h2>
         <input type="text" id="name" placeholder="Name" />
-        <button onclick="submitName('{{ current_option }}')">SUBMIT</button>
+        <button id="submit" onclick="submitName('{{ current_option }}')">
+          SUBMIT
+        </button>
       </div>
     </div>
     {% endif %}

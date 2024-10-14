@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template
 from ..database import get_db_connection
 
-bp = Blueprint('admin', __name__)
+bp = Blueprint("admin", __name__)
+
 
 @bp.route("/players")
 def view_players():

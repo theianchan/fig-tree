@@ -13,27 +13,11 @@ function repeatText() {
   backgroundText.innerText = (text + "\n\n").repeat(repeatCount);
 }
 
-// function generateUniqueId() {
-//   return "id_" + Math.random().toString(36).substr(2, 9);
-// }
-
-// function getOrCreateUserId() {
-//   let userId = getCookie("userId");
-//   if (!userId) {
-//     userId = generateUniqueId();
-//     document.cookie = `userId=${userId}; path=/; max-age=${60 * 60 * 24 * 365}`; 
-//     // 1 year expiry
-//   }
-//   return userId;
-// }
-
-// function getCookie(name) {
-//   const value = `; ${document.cookie}`;
-//   const parts = value.split(`; ${name}=`);
-//   if (parts.length === 2) return parts.pop().split(";").shift();
-// }
-
 function submitName(currentOption) {
+  const submitButton = document.getElementById('submit');
+  submitButton.disabled = true;
+  submitButton.classList.add('disabled');
+
   const name = document.getElementById("name").value;
 
   fetch("/submit_name", {
@@ -55,6 +39,8 @@ function submitName(currentOption) {
     })
     .catch((error) => {
       console.error("Error:", error);
+      submitButton.disabled = false;
+      submitButton.classList.remove('disabled');
     });
 }
 
@@ -85,6 +71,10 @@ function deactivateWindow() {
 }
 
 function handleCommit(committed) {
+  const commitButton = document.getElementById('commit');
+  commitButton.disabled = true;
+  commitButton.classList.add('disabled');
+
   fetch("/handle_commit", {
     method: "POST",
     headers: {
@@ -104,6 +94,8 @@ function handleCommit(committed) {
     })
     .catch((error) => {
       console.error("Error:", error);
+      commitButton.disabled = false;
+      commitButton.classList.remove('disabled');
     });
 }
 

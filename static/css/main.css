@@ -151,6 +151,13 @@ button
     font-optical-sizing: auto;
 }
 
+button.disabled
+{
+    cursor: not-allowed;
+
+    opacity: .5;
+}
+
 .continue
 {
     font-weight: 700;
