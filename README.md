@@ -32,5 +32,8 @@ Deploying:
 - `git push`
 - `git push heroku main`
 
+To view logs:
+- `heroku logs --tail`
+
 Remaining TODO:
 - Might want to pause the game when they're not playing
