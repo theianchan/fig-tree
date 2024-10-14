@@ -41,19 +41,25 @@
           You are {{ choice['age'] }} years old.
         </h2>
         <p>{{ choice['stage_text'] }}</p>
-        <p>{{ choice['option_text'] }}</p>
+        {% for paragraph in choice['option_text'].split('\n') %}
+        <p>{{ paragraph }}</p>
+        {% endfor %}
         <h2>{{ choice['choice_title'] }}</h2>
         <p>{{ choice['choice_text'] }}</p>
         <p>Time passes...</p>
         {% endfor %}
 
         <h2>
-          Hello, {{ player['name'] }}.<br />
-          You are {{ player['current_age'] }} years old.
+        Hello, {{ player['name'] }}.<br />
+        You are {{ player['current_age'] }} years old.
         </h2>
         <p>{{ player['current_stage_text'] }}</p>
+        {% if player['current_option_text'] %}
+        {% for paragraph in player['current_option_text'].split('\n') %}
+        <p>{{ paragraph }}</p>
+        {% endfor %}
+        {% endif %}
         <p>Current option: {{ player['current_option'] }}</p>
-        <p>{{ player['current_option_text'] }}</p>
 
         {% if player['current_age']|int < 77 and player['current_option'] %}
         <button id="commit" onclick="commit()">COMMIT</button>

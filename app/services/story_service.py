@@ -79,7 +79,7 @@ def generate_option_text(player_id, option):
 
         Instructions:
 
-        1. Return your response in two paragraphs.
+        1. Return your response as two paragraphs, separated by a newline character \n.
         2. The first paragraph should describe in 30-50 words the concrete experiences that 
         are leading the player to consider this path. Invoke detailed settings and people.
         If the player's journey has ended in a specific setting, continue from there.
@@ -88,8 +88,9 @@ def generate_option_text(player_id, option):
         4. We provide some default values for paths (family, poet, professor, adventurer, athlete)
         but the player can type in anything they want, so be prepared to handle unexpected inputs.
 
-        IMPORTANT: Your response should include ONLY THE STORY TEXT. It will be inserted directly 
-        into the player's experience, so do not precede or follow the story text with any comments. 
+        IMPORTANT: Your response should include ONLY TWO STORY TEXT PARAGRAPHS AND \n. 
+        It will be consumed by a data pipeline expecting this format, so do not precede or 
+        follow the response with any comments. 
         """
     text = get_claude_response(prompt)
 

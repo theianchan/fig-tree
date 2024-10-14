@@ -4,7 +4,6 @@ from .database import init_db
 from .routes import main_routes, admin_routes
 import logging
 
-
 def create_app():
     app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
@@ -18,7 +17,7 @@ def create_app():
 
     app.register_blueprint(main_routes.bp)
     app.register_blueprint(admin_routes.bp, url_prefix="/admin")
-
+    
     return app
 
 

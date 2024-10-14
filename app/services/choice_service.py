@@ -1,7 +1,6 @@
 from ..database import get_db_connection
 from ..utils import generate_unique_id
 
-
 def get_player_choices(player_id):
     conn = get_db_connection()
     c = conn.cursor()
