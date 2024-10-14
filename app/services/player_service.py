@@ -17,7 +17,7 @@ def get_player(player_id):
     return player
 
 
-def create_player(name, current_option):
+def create_player(name, current_option, current_option_text):
     player_id = generate_unique_id("player", "players")
     current_age = 21
     current_time = datetime.now(timezone.utc).isoformat()
@@ -25,20 +25,23 @@ def create_player(name, current_option):
     c = conn.cursor()
     c.execute(
         """
-        INSERT INTO players (id, name, current_age, current_option, time_stage_started)
-        VALUES (%s, %s, %s, %s, %s)
-        ON CONFLICT (id) DO UPDATE
-        SET name = EXCLUDED.name,
-            current_age = EXCLUDED.current_age,
-            current_option = EXCLUDED.current_option,
-            time_stage_started = EXCLUDED.time_stage_started
+        INSERT INTO players (
+            id,
+            name,
+            current_age,
+            time_stage_started,
+            current_option,
+            current_option_text
+        )
+        VALUES (%s, %s, %s, %s, %s, %s)
         """,
         (
             player_id,
             name,
             current_age,
-            current_option,
             current_time,
+            current_option,
+            current_option_text,
         ),
     )
     conn.commit()
@@ -46,19 +49,36 @@ def create_player(name, current_option):
     return player_id
 
 
-def update_player_option(player_id, current_option):
+def update_player_option(player_id, current_option, current_option_text):
     conn = get_db_connection()
     c = conn.cursor()
     c.execute(
         """
         UPDATE players 
-        SET current_option = %s 
+        SET current_option = %s,
+            current_option_text = %s
         WHERE id = %s
         """,
         (
             current_option,
+            current_option_text,
             player_id,
         ),
+    )
+    conn.commit()
+    conn.close()
+
+
+def update_player_stage_text(player_id, current_stage_text):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute(
+        """
+        UPDATE players 
+        SET current_stage_text = %s 
+        WHERE id = %s
+        """,
+        (current_stage_text, player_id),
     )
     conn.commit()
     conn.close()
@@ -72,8 +92,9 @@ def update_player_age(player_id):
         """
         UPDATE players
         SET current_age = current_age + 7,
+            time_stage_started = %s,
             current_option = NULL,
-            time_stage_started = %s
+            current_option_text = NULL
         WHERE id = %s
         """,
         (

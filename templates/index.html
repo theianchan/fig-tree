@@ -51,7 +51,9 @@
           Hello, {{ player['name'] }}.<br />
           You are {{ player['current_age'] }} years old.
         </h2>
+        <p>{{ player['current_stage_text'] }}</p>
         <p>Current option: {{ player['current_option'] }}</p>
+        <p>{{ player['current_option_text'] }}</p>
 
         {% if player['current_age']|int < 77 and player['current_option'] %}
         <button id="commit" onclick="commit()">COMMIT</button>

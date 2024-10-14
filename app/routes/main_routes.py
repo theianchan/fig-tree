@@ -4,8 +4,15 @@ from ..services.player_service import (
     get_player,
     create_player,
     update_player_age,
+    update_player_stage_text,
 )
 from ..services.choice_service import get_player_choices, create_player_choice
+from ..services.story_service import (
+    generate_stage_text,
+    generate_option_text,
+    generate_choice_title_text,
+    generate_no_choice_title_text,
+)
 import logging
 
 bp = Blueprint("main", __name__)
@@ -17,13 +24,29 @@ def index():
     current_option = request.args.get("fig") or None
 
     if player_id:
-        if current_option:
-            update_player_option(player_id, current_option)
-
         player = get_player(player_id)
-        choices = get_player_choices(player_id)
 
         if player:
+            choices = get_player_choices(player_id)
+
+            # If the player is entering a new stage (no stage text),
+            # generate new stage text and save it.
+            if not player["current_stage_text"]:
+                current_stage_text = generate_stage_text()
+                player["current_stage_text"] = current_stage_text
+                update_player_stage_text(player_id, current_stage_text)
+
+            # If a fig was tapped, generate new option text and save it.
+            if current_option:
+                current_option_text = generate_option_text()
+                player["current_option"] = current_option
+                player["current_option_text"] = current_option_text
+                update_player_option(player_id, current_option, current_option_text)
+
+            # If a fig was not tapped, use the existing player values.
+            # If there are no values, the template will ask the player to
+            # tap a fig to continue.
+
             return render_template("index.html", player=player, choices=choices)
 
     # For new players, write the value of `current_option` to the template.
@@ -40,8 +63,9 @@ def submit_name():
         current_option = (
             data.get("current_option") if data.get("current_option") != "None" else None
         )
+        current_option_text = generate_option_text() if current_option else None
 
-        player_id = create_player(name, current_option)
+        player_id = create_player(name, current_option, current_option_text)
 
         response = make_response(
             jsonify({"success": True, "message": "Submitted successfully"})
@@ -60,27 +84,20 @@ def handle_commit():
         player_id = request.cookies.get("playerId")
         committed = request.json.get("committed")
 
-        stage_text = (
-            request.json.get("stage_text") or "You see a world full of possibility."
-        )
-        option_text = (
-            request.json.get("option_text") or "Is this the right time for this choice?"
-        )
-
         if not player_id:
             return jsonify({"success": False, "message": "Player not found"}), 400
 
         player = get_player(player_id)
         current_age = player["current_age"]
+        stage_text = player["current_stage_text"]
+        option_text = player["current_option_text"]
 
         if committed:
             choice_raw = player["current_option"]
-            choice_title = request.json.get("choice_title") or "You make your choice."
-            choice_text = request.json.get("choice_text") or "You move forward boldly."
+            choice_title, choice_text = generate_choice_title_text()
         else:
             choice_raw = "no commit"
-            choice_title = "You don't make a choice."
-            choice_text = "You hesitate waiting for something better."
+            choice_title, choice_text = generate_no_choice_title_text()
 
         update_player_age(player_id)
         create_player_choice(

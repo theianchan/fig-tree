@@ -25,8 +25,10 @@ def init_db():
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
                 current_age INTEGER,
+                current_stage_text TEXT,
+                time_stage_started TIMESTAMP,
                 current_option TEXT,
-                time_stage_started TIMESTAMP
+                current_option_text TEXT
             );
             """
         )
