@@ -25,47 +25,61 @@ app = create_app()
 
 @app.route("/")
 def index():
-    user_id = request.cookies.get("userId")
-    fig = request.args.get("fig")
+    player_id = request.cookies.get("playerId")
+    current_option = request.args.get("fig") or None
 
-    if user_id:
+    if player_id:
         conn = get_db_connection()
         c = conn.cursor()
 
-        if fig:
+        if current_option:
+            # Set current_option based on the tapped fig.
             c.execute(
                 """
                 UPDATE players
-                SET last_tap = %s
+                SET current_option = %s
                 WHERE id = %s
                 """,
-                (fig, user_id),
+                (current_option, player_id),
             )
             conn.commit()
 
+        # Get the player's information, including past choices.
         c.execute(
             """
             SELECT *
             FROM players
             WHERE id = %s
             """,
-            (user_id,),
+            (player_id,),
         )
         player = c.fetchone()
+
+        c.execute(
+            """
+            SELECT *
+            FROM choices
+            WHERE player_id = %s
+            """,
+            (player_id,),
+        )
+        choices = c.fetchall()
+
         conn.close()
 
         if player:
-            return render_template("index.html", player=player)
+            return render_template("index.html", player=player, choices=choices)
 
-    return render_template("index.html", fig=fig)
-    # Write the value of `fig` to the template for new players
-    # This won't otherwise be preserved since we strip parameters
+    # For new players, write the value of `current_option` to the template.
+    # This won't otherwise be preserved since we strip parameters via JS on load.
+    return render_template("index.html", current_option=current_option)
 
 
-@app.route("/data")
-def view_database():
+@app.route("/players")
+def view_players():
     conn = get_db_connection()
     c = conn.cursor()
+
     c.execute(
         """
         SELECT *
@@ -73,31 +87,56 @@ def view_database():
         """
     )
     players = c.fetchall()
+
     conn.close()
-    return render_template("data.html", players=players)
+    return render_template("data.html", data=players)
+
+
+@app.route("/choices")
+def view_choices():
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute(
+        """
+        SELECT *
+        FROM player_choices
+        """
+    )
+    player_choices = c.fetchall()
+
+    conn.close()
+    return render_template("data.html", data=player_choices)
 
 
 @app.route("/submit_name", methods=["POST"])
 def submit_name():
     try:
         data = request.json
+        id = generate_unique_id("player", "players")
         name = data.get("name")
-        fig = data.get("fig")
-        user_id = generate_unique_id()
+        current_age = 21
+        current_option = data.get("current_option") if data.get("current_option") != "None" else None
         current_time = datetime.now(timezone.utc).isoformat()
 
         conn = get_db_connection()
         c = conn.cursor()
+
+        # Create a new player and set age to 21.
+        # If the ID already exists (which shouldn't happen
+        # because `generate_unique_id` checks the database),
+        # overwrite the existing record.
         c.execute(
             """
-            INSERT INTO players (id, name, age, time_last_stage, last_tap)
+            INSERT INTO players (id, name, current_age, current_option, time_stage_started)
             VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT (id) DO UPDATE
             SET name = EXCLUDED.name,
-                age = EXCLUDED.age,
-                time_last_stage = EXCLUDED.time_last_stage
+                current_age = EXCLUDED.current_age,
+                current_option = EXCLUDED.current_option,
+                time_stage_started = EXCLUDED.time_stage_started
             """,
-            (user_id, name, 21, current_time, fig),
+            (id, name, current_age, current_option, current_time),
         )
         conn.commit()
         conn.close()
@@ -105,7 +144,7 @@ def submit_name():
         response = make_response(
             jsonify({"success": True, "message": "Submitted successfully"})
         )
-        response.set_cookie("userId", user_id, path="/", max_age=60 * 60 * 24 * 365)
+        response.set_cookie("playerId", id, path="/", max_age=60 * 60 * 24 * 365)
 
         return response
 
@@ -117,40 +156,84 @@ def submit_name():
 @app.route("/handle_commit", methods=["POST"])
 def handle_commit():
     try:
-        user_id = request.cookies.get("userId")
+        player_id = request.cookies.get("playerId")
+        choice_id = generate_unique_id("choice", "choices")
         committed = request.json.get("committed")
+
+        stage_text = request.json.get("stage_text") or "You see a world full of possibility."
+        option_text = request.json.get("option_text") or "Is this the right time for this choice?"
+
         current_time = datetime.now(timezone.utc).isoformat()
 
-        if not user_id:
-            return jsonify({"success": False, "message": "User not found"}), 400
+        if not player_id:
+            return jsonify({"success": False, "message": "Player not found"}), 400
 
         conn = get_db_connection()
         c = conn.cursor()
 
+        # Get the player's current age and option.
         c.execute(
             """
-            SELECT age, last_tap
+            SELECT 
+                current_age, 
+                current_option
             FROM players
             WHERE id = %s
             """,
-            (user_id,),
+            (player_id,),
         )
         player = c.fetchone()
-        current_age = player["age"]
 
-        choice_value = player["last_tap"] if committed else "no commit"
+        current_age = player["current_age"]
 
+        if committed:
+            choice_raw = player["current_option"] 
+            choice_title = request.json.get("choice_title") or "You make your choice."
+            choice_text = request.json.get("choice_text") or "You move forward boldly."
+        else:
+            choice_raw = "no commit"
+            choice_title = "You don't make a choice."
+            choice_text = "You hesitate waiting for something better."
+
+        # Update the player's age and clear current option.
         c.execute(
             f"""
             UPDATE players
-            SET age = age + 7,
-                time_last_stage = %s,
-                choice_{current_age} = %s,
-                last_tap = NULL
+            SET current_age = current_age + 7,
+                current_option = NULL,
+                time_stage_started = %s
             WHERE id = %s
             """,
-            (current_time, choice_value, user_id),
+            (current_time, player_id),
         )
+
+        # Record the player's choice.
+        c.execute(
+            """
+            INSERT INTO choices (
+                id,
+                player_id, 
+                age, 
+                stage_text, 
+                option_text, 
+                choice_raw, 
+                choice_title, 
+                choice_text
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                choice_id,
+                player_id,
+                current_age,
+                stage_text,
+                option_text,
+                choice_raw,
+                choice_title,
+                choice_text,
+            ),
+        )
+
         conn.commit()
         conn.close()
 
@@ -162,21 +245,24 @@ def handle_commit():
         return jsonify({"success": False, "message": "Server error"}), 500
 
 
-def generate_unique_id():
+def generate_unique_id(object_name, object_table):
     while True:
-        new_id = "player_" + "".join(
+        new_id = f"{object_name}_" + "".join(
             random.choices(string.ascii_lowercase + string.digits, k=18)
         )
         conn = get_db_connection()
         c = conn.cursor()
+
+        # Check if the generated ID already exists.
         c.execute(
-            """
+            f"""
             SELECT id
-            FROM players
+            FROM {object_table}
             WHERE id = %s
             """,
-            (new_id,),
+            (new_id,)
         )
+
         if not c.fetchone():
             conn.close()
             return new_id

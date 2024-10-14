@@ -4,35 +4,36 @@ From the tip of every branch, like a fat purple fig, a wonderful future beckoned
 
 I saw myself sitting in the crotch of this fig tree, starving to death, just because I couldn't make up my mind which of the figs I would choose. I wanted each and every one of them, but choosing one meant losing all the rest, and, as I sat there, unable to decide, the figs began to wrinkle and go black, and, one by one, they plopped to the ground at my feet.`;
 
+let timerTimeout;
+
 function repeatText() {
   const backgroundText = document.querySelector(".background-text");
-  const repeatCount = Math.ceil(window.innerHeight / 300) + 1; // Adjust 300 based on your font size and line height
+  const repeatCount = Math.ceil(window.innerHeight / 300) + 1; 
+  // Adjust 300 based on your font size and line height
   backgroundText.innerText = (text + "\n\n").repeat(repeatCount);
 }
 
-window.addEventListener("load", repeatText);
-window.addEventListener("resize", repeatText);
+// function generateUniqueId() {
+//   return "id_" + Math.random().toString(36).substr(2, 9);
+// }
 
-function generateUniqueId() {
-  return "id_" + Math.random().toString(36).substr(2, 9);
-}
+// function getOrCreateUserId() {
+//   let userId = getCookie("userId");
+//   if (!userId) {
+//     userId = generateUniqueId();
+//     document.cookie = `userId=${userId}; path=/; max-age=${60 * 60 * 24 * 365}`; 
+//     // 1 year expiry
+//   }
+//   return userId;
+// }
 
-function getOrCreateUserId() {
-  let userId = getCookie("userId");
-  if (!userId) {
-    userId = generateUniqueId();
-    document.cookie = `userId=${userId}; path=/; max-age=${60 * 60 * 24 * 365}`; // 1 year expiry
-  }
-  return userId;
-}
+// function getCookie(name) {
+//   const value = `; ${document.cookie}`;
+//   const parts = value.split(`; ${name}=`);
+//   if (parts.length === 2) return parts.pop().split(";").shift();
+// }
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-}
-
-function submitName(fig) {
+function submitName(currentOption) {
   const name = document.getElementById("name").value;
 
   fetch("/submit_name", {
@@ -40,7 +41,7 @@ function submitName(fig) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ name: name, fig: fig }),
+    body: JSON.stringify({ name: name, current_option: currentOption }),
   })
     .then((response) => {
       if (!response.ok) {
@@ -82,8 +83,6 @@ function deactivateWindow() {
     timerCard.style.display = "none";
   }
 }
-
-let timerTimeout;
 
 function handleCommit(committed) {
   fetch("/handle_commit", {
@@ -127,11 +126,11 @@ function updateTimer() {
   const playerAge = parseInt(timerElement.dataset.age);
   if (playerAge >= 77) return;
 
-  const lastStageTime = new Date(timerElement.dataset.lastStage).getTime();
+  const timeStageStarted = new Date(timerElement.dataset.timeStageStarted).getTime();
   const currentTime =
     new Date().getTime() + new Date().getTimezoneOffset() * 60000;
-  const elapsedTime = currentTime - lastStageTime;
-  const remainingTime = Math.max(0.5 * 60 * 1000 - elapsedTime, 0); // 5 minutes in milliseconds
+  const elapsedTime = currentTime - timeStageStarted;
+  const remainingTime = Math.max(5 * 60 * 1000 - elapsedTime, 0); // 5 minutes in milliseconds
 
   if (remainingTime === 0) {
     timerElement.textContent = "00:00";
@@ -159,6 +158,8 @@ function clearUrlParameters() {
   }
 }
 
+window.addEventListener("load", repeatText);
+window.addEventListener("resize", repeatText);
 window.addEventListener("load", updateTimer);
 window.addEventListener("load", initializeWindow);
 window.addEventListener("load", clearUrlParameters);

@@ -18,7 +18,7 @@ To run locally:
 
 To interact with the database locally:
 - `psql -d tree`
-- `\dt` to list tables
+- `\d` to list tables and views
 - `\q` to quit
 
 To interact with the database on Heroku:

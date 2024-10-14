@@ -24,35 +24,27 @@
 </head>
 <body>
     <h1>Data</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Age</th>
-                <th>Story</th>
-                <th>Last Tap</th>
-                <th>Time Last Stage</th>
-                {% for i in range(1, 9) %}
-                    <th>Choice {{ 21 + 7 * (i - 1) }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for player in players %}
+    {% if data %}
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ player['id'] }}</td>
-                    <td>{{ player['name'] }}</td>
-                    <td>{{ player['age'] }}</td>
-                    <td>{{ player['story'] }}</td>
-                    <td>{{ player['last_tap'] }}</td>
-                    <td>{{ player['time_last_stage'] }}</td>
-                    {% for i in range(1, 9) %}
-                        <td>{{ player['choice_' ~ (21 + 7 * (i - 1))] }}</td>
+                    {% for column in data[0].keys() %}
+                        <th>{{ column }}</th>
                     {% endfor %}
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                    <tr>
+                        {% for value in row.values() %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No data available.</p>
+    {% endif %}
 </body>
 </html>
