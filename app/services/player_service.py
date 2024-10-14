@@ -17,7 +17,21 @@ def get_player(player_id):
     return player
 
 
-def create_player(name, current_option, current_option_text):
+def get_player_age(player_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute(
+        """
+        SELECT current_age FROM players WHERE id = %s
+        """,
+        (player_id,),
+    )
+    age = c.fetchone()['current_age']
+    conn.close()
+    return age
+
+
+def create_player(name, current_option):
     player_id = generate_unique_id("player", "players")
     current_age = 21
     current_time = datetime.now(timezone.utc).isoformat()
@@ -30,10 +44,9 @@ def create_player(name, current_option, current_option_text):
             name,
             current_age,
             time_stage_started,
-            current_option,
-            current_option_text
+            current_option
         )
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s)
         """,
         (
             player_id,
@@ -41,7 +54,6 @@ def create_player(name, current_option, current_option_text):
             current_age,
             current_time,
             current_option,
-            current_option_text,
         ),
     )
     conn.commit()

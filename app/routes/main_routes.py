@@ -1,18 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, make_response
-from ..services.player_service import (
-    update_player_option,
-    get_player,
-    create_player,
-    update_player_age,
-    update_player_stage_text,
-)
-from ..services.choice_service import get_player_choices, create_player_choice
-from ..services.story_service import (
-    generate_stage_text,
-    generate_option_text,
-    generate_choice_title_text,
-    generate_no_choice_title_text,
-)
+from ..services.player_service import *
+from ..services.choice_service import *
+from ..services.story_service import *
 import logging
 
 bp = Blueprint("main", __name__)
@@ -32,16 +21,30 @@ def index():
             # If the player is entering a new stage (no stage text),
             # generate new stage text and save it.
             if not player["current_stage_text"]:
-                current_stage_text = generate_stage_text()
+                current_stage_text = generate_stage_text(player_id)
                 player["current_stage_text"] = current_stage_text
                 update_player_stage_text(player_id, current_stage_text)
 
             # If a fig was tapped, generate new option text and save it.
             if current_option:
-                current_option_text = generate_option_text()
+                current_option_text = generate_option_text(player_id, current_option)
                 player["current_option"] = current_option
                 player["current_option_text"] = current_option_text
                 update_player_option(player_id, current_option, current_option_text)
+
+            # If a fig was NOT tapped but there is a saved current option with no text
+            # (which happens on new user creation), generate new option text and save it.
+            elif player["current_option"] and not player["current_option_text"]:
+                current_option_text = generate_option_text(
+                    player_id, player["current_option"]
+                )
+                player["current_option_text"] = current_option_text
+                update_player_option(
+                    player_id, player["current_option"], current_option_text
+                )
+
+            else:
+                pass
 
             # If a fig was not tapped, use the existing player values.
             # If there are no values, the template will ask the player to
@@ -63,9 +66,8 @@ def submit_name():
         current_option = (
             data.get("current_option") if data.get("current_option") != "None" else None
         )
-        current_option_text = generate_option_text() if current_option else None
 
-        player_id = create_player(name, current_option, current_option_text)
+        player_id = create_player(name, current_option)
 
         response = make_response(
             jsonify({"success": True, "message": "Submitted successfully"})
