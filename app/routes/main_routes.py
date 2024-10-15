@@ -32,6 +32,10 @@ def index():
                 player["current_option_text"] = current_option_text
                 update_player_option(player_id, current_option, current_option_text)
 
+                # If the fig is the first in a stage, set the time.
+                if not player["time_stage_started"]:
+                    update_player_time_stage_started(player_id)
+
             # If a fig was NOT tapped but there is a saved current option with no text
             # (which happens on new user creation), generate new option text and save it.
             elif player["current_option"] and not player["current_option_text"]:
@@ -42,6 +46,10 @@ def index():
                 update_player_option(
                     player_id, player["current_option"], current_option_text
                 )
+
+                # Same here (inelegant, fix later)
+                if not player["time_stage_started"]:
+                    update_player_time_stage_started(player_id)
 
             else:
                 pass
@@ -92,14 +100,17 @@ def handle_commit():
         player = get_player(player_id)
         current_age = player["current_age"]
         stage_text = player["current_stage_text"]
-        option_text = player["current_option_text"]
 
         if committed:
+            option_text = player["current_option_text"]
             choice_raw = player["current_option"]
-            choice_title, choice_text = generate_choice_title_text()
+            choice_title, choice_text = generate_choice_title_text(
+                player_id, choice_raw
+            )
         else:
+            option_text = None
             choice_raw = "no commit"
-            choice_title, choice_text = generate_no_choice_title_text()
+            choice_title, choice_text = generate_no_choice_title_text(player_id)
 
         update_player_age(player_id)
         create_player_choice(

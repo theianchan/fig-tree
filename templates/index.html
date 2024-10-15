@@ -21,7 +21,7 @@
     </div>
     {% if player %}
     <div class="position">
-      {% if player['current_age']|int < 77 %}
+      {% if player['current_age']|int < 77 and player['time_stage_started'] %}
       <div id="timer-container">
         <div class="card top dark">
           <span class="timer">
@@ -44,9 +44,11 @@
           You are {{ choice['age'] }} years old.
         </h2>
         <p>{{ choice['stage_text'] }}</p>
+        {% if choice['option_text'] %}
         {% for paragraph in choice['option_text'].split('\n') %}
         <p>{{ paragraph }}</p>
         {% endfor %}
+        {% endif %}
         <h2>{{ choice['choice_title'] }}</h2>
         <p>{{ choice['choice_text'] }}</p>
         <p>Time passes...</p>
@@ -62,7 +64,6 @@
         <p>{{ paragraph }}</p>
         {% endfor %}
         {% endif %}
-        <p>Current option: {{ player['current_option'] }}</p>
 
         {% if player['current_age']|int < 77 and player['current_option'] %}
         <button id="commit" onclick="commit()">COMMIT</button>

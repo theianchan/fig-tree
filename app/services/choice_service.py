@@ -1,6 +1,7 @@
 from ..database import get_db_connection
 from ..utils import generate_unique_id
 
+
 def get_player_choices(player_id):
     conn = get_db_connection()
     c = conn.cursor()
@@ -56,7 +57,7 @@ def create_player_choice(
     conn.close()
 
 
-def compile_player_history(player_id):
+def compile_player_history(player_id, include_current_option=False):
     conn = get_db_connection()
     c = conn.cursor()
     c.execute(
@@ -80,6 +81,7 @@ def compile_player_history(player_id):
         history += f"Hello, {player['name']}.\n"
         history += f"You are {choice['age']} years old.\n\n"
         history += f"{choice['stage_text']}\n\n"
+        history += f"{choice['option_text']}\n\n"
         history += f"{choice['choice_title']}\n\n"
         history += f"{choice['choice_text']}\n\n"
         history += "Time passes...\n\n"
@@ -90,7 +92,7 @@ def compile_player_history(player_id):
     if player["current_stage_text"]:
         history += f"{player['current_stage_text']}\n\n"
 
-    if player["current_option"]:
+    if player["current_option"] and include_current_option:
         history += f"{player['current_option_text']}\n\n"
 
     return history

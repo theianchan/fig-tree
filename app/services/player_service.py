@@ -26,7 +26,7 @@ def get_player_age(player_id):
         """,
         (player_id,),
     )
-    age = c.fetchone()['current_age']
+    age = c.fetchone()["current_age"]
     conn.close()
     return age
 
@@ -97,22 +97,35 @@ def update_player_stage_text(player_id, current_stage_text):
 
 
 def update_player_age(player_id):
-    current_time = datetime.now(timezone.utc).isoformat()
     conn = get_db_connection()
     c = conn.cursor()
     c.execute(
         """
         UPDATE players
         SET current_age = current_age + 7,
-            time_stage_started = %s,
+            current_stage_text = NULL,
+            time_stage_started = NULL,
             current_option = NULL,
             current_option_text = NULL
         WHERE id = %s
         """,
-        (
-            current_time,
-            player_id,
-        ),
+        (player_id,),
+    )
+    conn.commit()
+    conn.close()
+
+
+def update_player_time_stage_started(player_id):
+    current_time = datetime.now(timezone.utc).isoformat()
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute(
+        """
+        UPDATE players 
+        SET time_stage_started = %s 
+        WHERE id = %s
+        """,
+        (current_time, player_id),
     )
     conn.commit()
     conn.close()

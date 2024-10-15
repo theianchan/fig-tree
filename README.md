@@ -36,4 +36,5 @@ To view logs:
 - `heroku logs --tail`
 
 Remaining TODO:
+- Fix timer
 - Might want to pause the game when they're not playing
