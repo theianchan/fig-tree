@@ -13,6 +13,7 @@ def create_app():
     )
     app.logger.handlers = logging.getLogger().handlers
     app.logger.debug("Initializing app")
+    logging.debug("Initializing app using logger")
 
     init_db()
 
@@ -22,7 +23,10 @@ def create_app():
     return app
 
 
+logging.debug("Starting app")
 app = create_app()
+logging.debug("App created")
 
 if __name__ == "__main__":
+    logging.debug("Name == main")
     app.run(debug=True)
