@@ -38,3 +38,6 @@ To view logs:
 Remaining TODO:
 - Fix timer
 - Might want to pause the game when they're not playing
+- Sometimes you should scroll to the choice, sometimes to the age
+- What's this ERROR:root:Error initializing database: duplicate key value violates unique constraint "pg_type_typname_nsp_index"
+- Not seeing my debug logs in Heroku
