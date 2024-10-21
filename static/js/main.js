@@ -129,7 +129,7 @@ function updateTimer() {
   const currentTime =
     new Date().getTime() + new Date().getTimezoneOffset() * 60000;
   const elapsedTime = currentTime - timeStageStarted;
-  const remainingTime = Math.max(1 * 60 * 1000 - elapsedTime, 0); // 5 minutes in milliseconds
+  const remainingTime = Math.max(5 * 60 * 1000 - elapsedTime, 0); // 5 minutes in milliseconds
 
   if (remainingTime === 0) {
     timerElement.textContent = "00:00";

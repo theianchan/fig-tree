@@ -66,17 +66,13 @@
         {% endif %}
 
         {% if player['current_age']|int < 77 and player['current_option'] %}
-        <button id="commit" onclick="commit()">COMMIT</button>
+        <button id="commit" onclick="commit()">COMMIT</button>        
         <p class="continue">Or tap another fig...</p>
         {% elif player['current_age']|int < 77 %}
         <p class="continue">Tap another fig to continue...</p>
+        {% else %}
+        Your journey is yours to continue...
         {% endif %} 
-        
-        {% if player['current_age']|int >= 35 %}
-        <button id="printReceipt" onclick="printReceipt()">
-          PRINT RECEIPT
-        </button>
-        {% endif %}
       </div>
     </div>
     {% else %}
